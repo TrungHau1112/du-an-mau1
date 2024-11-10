@@ -39,15 +39,17 @@ class DBUtil
         return $stmt->execute();
     }
     // Phương thức đăng ký người dùng mới
-    public function registerUser($name, $email, $password) {
+    public function registerUser($name, $email, $password, $role = 'user') {
         try {
-            $query = "INSERT INTO users (name, email, password) VALUES (:name, :email, :password)";
+            // Cập nhật câu lệnh SQL để thêm trường 'role'
+            $query = "INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)";
             $stmt = $this->conn->prepare($query);
     
             // Liên kết các tham số với giá trị
             $stmt->bindParam(':name', $name);
             $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':password', $password);  // Lưu mật khẩu bình thường
+            $stmt->bindParam(':password', $password); // Lưu mật khẩu bình thường
+            $stmt->bindParam(':role', $role); // Liên kết tham số 'role'
     
             // Thực thi truy vấn
             if ($stmt->execute()) {
@@ -60,6 +62,7 @@ class DBUtil
             return false;
         }
     }
+    
     public function loginUser($email, $password) {
         $sql = "SELECT * FROM users WHERE email = :email AND password = :password LIMIT 1";
         $stmt = $this->conn->prepare($sql);

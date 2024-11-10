@@ -40,8 +40,23 @@ if (isset($_GET['code'])) {
             session_start();
             $_SESSION['user_email'] = $email;
             $_SESSION['user_name'] = $name;
-            header("Location: index.php");  // Chuyển hướng người dùng tới trang index.php
-            exit;
+
+            // Kiểm tra vai trò của người dùng trong DB và chuyển hướng
+            $query = "SELECT role FROM users WHERE email = :email";
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            $role = $row['role'];
+
+            // Chuyển hướng đến trang admin nếu là admin, nếu không sẽ chuyển tới trang người dùng
+            if ($role === 'admin') {
+                header("Location: admin.php");
+                exit;
+            } else {
+                header("Location: index.php");  // Người dùng thông thường chuyển đến trang chính
+                exit;
+            }
         } else {
             $result = $dbUtil->registerUser($name, $email, ""); // Bỏ qua mật khẩu khi dùng Google đăng ký
             echo $result ? "New record created successfully." : "Error registering user.";
@@ -61,15 +76,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Kiểm tra thông tin đăng nhập trong cơ sở dữ liệu
     $user = $dbUtil->loginUser($email, $password);
 
-    if ($user) {
-        // Nếu đăng nhập thành công, chuyển hướng người dùng đến trang chính
-        session_start();
-        $_SESSION['user_id'] = $user['id'];  // Giả sử bạn lưu id người dùng trong cơ sở dữ liệu
+    session_start(); // Bắt đầu session
+
+    // Đoạn mã xử lý đăng nhập với Google hoặc email
+    if (isset($user)) { // Khi người dùng đăng nhập thành công
         $_SESSION['user_name'] = $user['name'];
-        header("Location: index.php");  // Chuyển hướng đến trang chính sau khi đăng nhập
-        exit;
+        $_SESSION['user_email'] = $user['email'];
+        $_SESSION['user_role'] = $user['role'];
+        $_SESSION['login_message'] = "Đăng nhập thành công!"; // Thêm thông báo đăng nhập thành công
+        
+        // Kiểm tra vai trò và chuyển hướng đến trang admin nếu là admin
+        if ($user['role'] === 'admin') {
+            header("Location: admin.php");  // Chuyển hướng tới trang quản trị
+            exit;
+        } else {
+            header("Location: index.php");  // Người dùng thông thường chuyển đến trang chính
+            exit;
+        }
     } else {
-        $error = "Sai email hoặc mật khẩu!";
+        $_SESSION['login_message'] = "Sai email hoặc mật khẩu!";
+        header("Location: login.php");
+        exit;
     }
 }
 
@@ -89,9 +116,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <h2 class="text-center">Đăng nhập</h2>
         
         <!-- Hiển thị thông báo lỗi nếu có -->
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger" role="alert">
-                <?php echo $error; ?>
+        <?php if (isset($_SESSION['login_message'])): ?>
+            <div class="alert alert-warning" role="alert">
+                <?php echo $_SESSION['login_message']; ?>
+                <?php unset($_SESSION['login_message']); ?>
             </div>
         <?php endif; ?>
         

@@ -32,19 +32,23 @@ if (isset($_GET['code'])) {
         $google_account_info = $google_oauth->userinfo->get();
         $email = $google_account_info->email;
         $name = $google_account_info->name;
-
-        // Sử dụng phương thức kiểm tra email trong DBUtil
+    
+        // Giả sử email có dạng admin@domain.com, thì sẽ phân quyền admin
+        $role = (strpos($email, 'admin@domain.com') !== false) ? 'admin' : 'user';
+    
+        // Kiểm tra xem email đã có trong DB chưa
         if ($dbUtil->checkIfEmailExists($email)) {
-            // Nếu người dùng đã có tài khoản, chuyển đến trang chính
             session_start();
             $_SESSION['user_email'] = $email;
             $_SESSION['user_name'] = $name;
-            header("Location: index.php");  // Chuyển hướng người dùng tới trang index.php
+            $_SESSION['user_role'] = $role;  // Lưu vai trò người dùng
+            header("Location: index.php");
             exit;
         } else {
-            $result = $dbUtil->registerUser($name, $email, ""); // Bỏ qua mật khẩu khi dùng Google đăng ký
+            $result = $dbUtil->registerUser($name, $email, "", $role); // Phân quyền cho người dùng
             echo $result ? "New record created successfully." : "Error registering user.";
         }
+    
     } else {
         echo 'Không thể lấy access token';
         exit;
@@ -57,9 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $email = $_POST['email'];
     $password = $_POST['password']; // Không mã hóa mật khẩu nữa
-
-    // Đăng ký thông qua phương thức của DBUtil
-    $result = $dbUtil->registerUser($name, $email, $password); // Sử dụng mật khẩu bình thường
+    $role = $_POST['role'];  // Lấy giá trị vai trò từ form
+    $result = $dbUtil->registerUser($name, $email, $password, $role);
     echo $result;
 }
 
@@ -93,6 +96,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <label for="password" class="form-label">Mật khẩu:</label>
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
+                <div class="mb-3">
+                    <label for="role" class="form-label">Vai trò:</label>
+                    <select class="form-control" id="role" name="role">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
                 <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
             </form>
         </div>

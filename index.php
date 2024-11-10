@@ -1,8 +1,16 @@
 <?php
-include_once('./DBUtil.php');
+include_once 'DBUtil.php';
 $dbHelper = new DBUtil();
-
+session_start();
+$loginMessage = '';
+if (isset($_SESSION['login_message'])) {
+    $loginMessage = $_SESSION['login_message'];
+    unset($_SESSION['login_message']); // Xóa thông báo sau khi hiển thị
+}
 ?>
+<?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin'): ?>
+    <a href="admin.php">Trang quản trị viên</a>
+<?php endif; ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -86,31 +94,31 @@ $dbHelper = new DBUtil();
 					<div class="menu-desktop">
 						<ul class="main-menu">
 							<li class="active-menu">
-								<a href="index.php">Home</a>
+								<a href="index.php">Trang Chủ</a>
 								<ul class="sub-menu">
-									<li><a href="index.html">Homepage 1</a></li>
+									<li><a href="index.php">Homepage 1</a></li>
 									
 								</ul>
 							</li>
 
 							<li>
-								<a href="product.html">Shop</a>
+								<a href="product.php">Sản Phẩm </a>
 							</li>
 
-							<li class="label1" data-label1="hot">
-								<a href="shoping-cart.html">Features</a>
+							<!-- <li class="label1" data-label1="hot">
+								<a href="shoping-cart.php">Features</a>
+							</li> -->
+
+							<li>
+								<a href="blog.php">Tin Tức</a>
 							</li>
 
 							<li>
-								<a href="blog.html">Blog</a>
+								<a href="about.php">Giới Thiệu</a>
 							</li>
 
 							<li>
-								<a href="about.html">About</a>
-							</li>
-
-							<li>
-								<a href="contact.html">Contact</a>
+								<a href="contact.php">Contact</a>
 							</li>
 						</ul>
 					</div>	
@@ -124,11 +132,15 @@ $dbHelper = new DBUtil();
 						<div class="icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 icon-header-noti js-show-cart" data-notify="2">
 							<i class="zmdi zmdi-shopping-cart"></i>
 						</div>
-
-						<a href="register.php" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 " data-notify="0">
-							<img class="nav-link" src="./images/pngwing.com.png" width="52px" >
-
-						</a>
+						
+						<?php if (isset($_SESSION['user_name'])): ?>
+							<p>Xin chào, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</p>
+							<a href="logout.php">Đăng xuất</a>
+						<?php else: ?>
+							<a href="login.php" class="dis-block icon-header-item cl2 hov-cl1 trans-04 p-l-22 p-r-11 " data-notify="0">
+								<img class="nav-link" src="./images/pngwing.com.png" width="52px">
+							</a>
+						<?php endif; ?>
 					</div>
 				</nav>
 			</div>	
@@ -197,7 +209,7 @@ $dbHelper = new DBUtil();
 
 			<ul class="main-menu-m">
 				<li>
-					<a href="index.html">Home</a>
+					<a href="index.php">Trang Chủ</a>
 					<ul class="sub-menu-m">
 						<li><a href="index.php">Homepage 1</a></li>
 						<!-- <li><a href="home-02.html">Homepage 2</a></li>
@@ -209,23 +221,23 @@ $dbHelper = new DBUtil();
 				</li>
 
 				<li>
-					<a href="product.html">Shop</a>
+					<a href="product.php">Sản Phẩm</a>
 				</li>
 
 				<li>
-					<a href="shoping-cart.html" class="label1 rs1" data-label1="hot">Features</a>
+					<a href="shoping-cart.php" class="label1 rs1" data-label1="hot">Features</a>
 				</li>
 
 				<li>
-					<a href="blog.html">Blog</a>
+					<a href="blog.php">Tin Tức</a>
 				</li>
 
 				<li>
-					<a href="about.html">About</a>
+					<a href="about.php">About</a>
 				</li>
 
 				<li>
-					<a href="contact.html">Contact</a>
+					<a href="contact.php">Contact</a>
 				</li>
 			</ul>
 		</div>
@@ -319,11 +331,11 @@ $dbHelper = new DBUtil();
 					</div>
 
 					<div class="header-cart-buttons flex-w w-full">
-						<a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">
+						<a href="shoping-cart.php" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-r-8 m-b-10">
 							Xem Giỏ Hàng
 						</a>
 
-						<a href="shoping-cart.html" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">
+						<a href="shoping-cart.php" class="flex-c-m stext-101 cl0 size-107 bg3 bor2 hov-btn3 p-lr-15 trans-04 m-b-10">
 							Thanh Toán
 						</a>
 					</div>
@@ -355,7 +367,7 @@ $dbHelper = new DBUtil();
 								
 							<div class="layer-slick1 animated visible-false" data-appear="zoomIn" data-delay="1600">
 								<a href="product.html" class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
-									Shop Now
+									Mua Ngay
 								</a>
 							</div>
 						</div>
@@ -378,8 +390,8 @@ $dbHelper = new DBUtil();
 							</div>
 								
 							<div class="layer-slick1 animated visible-false" data-appear="slideInUp" data-delay="1600">
-								<a href="product.html" class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
-									Shop Now
+								<a href="product.php" class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
+									Mua Ngay
 								</a>
 							</div>
 						</div>
@@ -402,8 +414,8 @@ $dbHelper = new DBUtil();
 							</div>
 								
 							<div class="layer-slick1 animated visible-false" data-appear="rotateIn" data-delay="1600">
-								<a href="product.html" class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
-									Shop Now
+								<a href="product.php" class="flex-c-m stext-101 cl0 size-101 bg1 bor1 hov-btn1 p-lr-15 trans-04">
+									Mua Ngay
 								</a>
 							</div>
 						</div>
@@ -423,7 +435,7 @@ $dbHelper = new DBUtil();
 					<div class="block1 wrap-pic-w">
 						<img src="images/banner-01.jpg" alt="IMG-BANNER">
 
-						<a href="product.html" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+						<a href="product.php" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
 							<div class="block1-txt-child1 flex-col-l">
 								<span class="block1-name ltext-102 trans-04 p-b-8">
 									Women
@@ -436,7 +448,7 @@ $dbHelper = new DBUtil();
 
 							<div class="block1-txt-child2 p-b-4 trans-05">
 								<div class="block1-link stext-101 cl0 trans-09">
-									Shop Now
+									Mua Ngay
 								</div>
 							</div>
 						</a>
@@ -448,7 +460,7 @@ $dbHelper = new DBUtil();
 					<div class="block1 wrap-pic-w">
 						<img src="images/banner-02.jpg" alt="IMG-BANNER">
 
-						<a href="product.html" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+						<a href="product.php" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
 							<div class="block1-txt-child1 flex-col-l">
 								<span class="block1-name ltext-102 trans-04 p-b-8">
 									Men
@@ -461,7 +473,7 @@ $dbHelper = new DBUtil();
 
 							<div class="block1-txt-child2 p-b-4 trans-05">
 								<div class="block1-link stext-101 cl0 trans-09">
-									Shop Now
+									Mua Ngay
 								</div>
 							</div>
 						</a>
@@ -473,7 +485,7 @@ $dbHelper = new DBUtil();
 					<div class="block1 wrap-pic-w">
 						<img src="images/banner-03.jpg" alt="IMG-BANNER">
 
-						<a href="product.html" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
+						<a href="product.php" class="block1-txt ab-t-l s-full flex-col-l-sb p-lr-38 p-tb-34 trans-03 respon3">
 							<div class="block1-txt-child1 flex-col-l">
 								<span class="block1-name ltext-102 trans-04 p-b-8">
 									Accessories
@@ -486,7 +498,7 @@ $dbHelper = new DBUtil();
 
 							<div class="block1-txt-child2 p-b-4 trans-05">
 								<div class="block1-link stext-101 cl0 trans-09">
-									Shop Now
+									Mua Ngay
 								</div>
 							</div>
 						</a>
@@ -543,7 +555,7 @@ $dbHelper = new DBUtil();
 					<div class="flex-c-m stext-106 cl6 size-105 bor4 pointer hov-btn3 trans-04 m-tb-4 js-show-search">
 						<i class="icon-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-search"></i>
 						<i class="icon-close-search cl2 m-r-6 fs-15 trans-04 zmdi zmdi-close dis-none"></i>
-						Search
+						Tìm Kiếm
 					</div>
 				</div>
 				
@@ -1664,6 +1676,12 @@ Copyright &copy;<script>document.write(new Date().getFullYear());</script> All r
 <!--===============================================================================================-->
 	<script src="vendor/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+            const loginMessage = "<?php echo $loginMessage; ?>";
+            if (loginMessage) {
+                alert(loginMessage);
+            }
+        });
 		$('.js-pscroll').each(function(){
 			$(this).css('position','relative');
 			$(this).css('overflow','hidden');
