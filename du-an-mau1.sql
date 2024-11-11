@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 09, 2024 at 05:18 AM
+-- Generation Time: Nov 11, 2024 at 08:23 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -89,16 +89,19 @@ CREATE TABLE `users` (
   `password` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `otp` varchar(6) DEFAULT NULL,
-  `otpCreated` datetime DEFAULT NULL
+  `otpCreated` datetime DEFAULT NULL,
+  `role` varchar(20) DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `name`, `email`, `password`, `created_at`, `otp`, `otpCreated`) VALUES
-(1, 'admin', 'phannguyentrunghau123456@gmail.com', 'Hau%11122005', '2024-11-08 16:02:46', '279517', '2024-11-09 03:13:40'),
-(4, 'admin', 'haupntpk03774@gmail.com', 'Hau%11122005', '2024-11-08 16:30:42', NULL, NULL);
+INSERT INTO `users` (`id`, `name`, `email`, `password`, `created_at`, `otp`, `otpCreated`, `role`) VALUES
+(1, 'admin', 'phannguyentrunghau123456@gmail.com', 'Hau%11122005', '2024-11-08 16:02:46', '279517', '2024-11-09 03:13:40', 'user'),
+(4, 'admin', 'haupntpk03774@gmail.com', 'Hau%11122005', '2024-11-08 16:30:42', NULL, NULL, 'user'),
+(5, 'Hậu', 'lab7demo12@gmail.com', '11122005a', '2024-11-10 09:30:57', NULL, NULL, 'admin'),
+(6, 'Anh Nguyễn Đình', 'anhndpk03775@gmail.com', '', '2024-11-10 13:35:40', NULL, NULL, 'user');
 
 --
 -- Indexes for dumped tables
@@ -169,7 +172,7 @@ ALTER TABLE `sanpham`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Constraints for dumped tables
